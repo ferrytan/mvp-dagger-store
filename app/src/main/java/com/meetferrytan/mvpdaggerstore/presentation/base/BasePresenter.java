@@ -6,10 +6,13 @@ import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.OnLifecycleEvent;
 
-import com.meetferrytan.mvpdaggerstore.util.callback.RequestCallback;
+import com.meetferrytan.mvpdaggerstore.util.callback.CompletedRequestCallback;
+import com.meetferrytan.mvpdaggerstore.util.callback.DataRequestCallback;
 
 import java.lang.ref.WeakReference;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -42,15 +45,72 @@ public abstract class BasePresenter<V extends BaseContract.View>
     }
 
     /**
-     * @param single          -> Single request to process.
-     * @param processId       -> unique processId from child presenter
-     * @param requestCallback -> request callback
-     * @param <F>             -> generic response object
+     * Method to simplify processing Single Request
+     *
+     * @param single              -> Single request to process.
+     * @param processId           -> unique processId from child presenter
+     * @param dataRequestCallback -> data request callback
+     * @param <F>                 -> generic response object
      */
-    protected <F> void processSingleRequest(Single<F> single, int processId, RequestCallback<F> requestCallback) {
+    protected <F> void processSingleRequest(Single<F> single, int processId, DataRequestCallback<F> dataRequestCallback) {
         getView().showLoading(processId, true);
         addDisposable(single.subscribe(f -> {
-            requestCallback.onRequestSuccess(f);
+            dataRequestCallback.onRequestSuccess(f);
+            getView().showLoading(processId, false);
+        }, throwable -> {
+            getView().showLoading(processId, false);
+            processError(processId, throwable);
+        }));
+    }
+
+    /**
+     * Method to simplify processing Flowable Request
+     *
+     * @param flowable            -> Single request to process.
+     * @param processId           -> unique processId from child presenter
+     * @param dataRequestCallback -> data request callback
+     * @param <F>->               generic response object
+     */
+    protected <F> void processFlowableRequest(Flowable<F> flowable, int processId, DataRequestCallback<F> dataRequestCallback) {
+        processFlowableRequest(flowable, processId, dataRequestCallback, null);
+    }
+
+    /**
+     * Method to simplify processing Flowable Request with completion callback
+     *
+     * @param flowable                 -> Single request to process.
+     * @param processId                -> unique processId from child presenter
+     * @param dataRequestCallback      -> data request callback
+     * @param completedRequestCallback -> request completion callback
+     * @param <F>->                    generic response object
+     */
+    protected <F> void processFlowableRequest(Flowable<F> flowable, int processId, DataRequestCallback<F> dataRequestCallback, CompletedRequestCallback completedRequestCallback) {
+        getView().showLoading(processId, true);
+        addDisposable(
+                flowable.subscribe(f -> {
+                    dataRequestCallback.onRequestSuccess(f);
+                    getView().showLoading(processId, false);
+                }, throwable -> {
+                    getView().showLoading(processId, false);
+                    processError(processId, throwable);
+                }, () -> {
+                    if (completedRequestCallback != null) {
+                        completedRequestCallback.onComplete();
+                    }
+                }));
+    }
+
+    /**
+     * Method to simplify processing Completable Request which only need to know request complete / error
+     *
+     * @param completable              -> Single request to process.
+     * @param processId                -> unique processId from child presenter
+     * @param completedRequestCallback -> completed request callback
+     */
+    protected void processCompletableRequest(Completable completable, int processId, CompletedRequestCallback completedRequestCallback) {
+        getView().showLoading(processId, true);
+        addDisposable(completable.subscribe(() -> {
+            completedRequestCallback.onComplete();
             getView().showLoading(processId, false);
         }, throwable -> {
             getView().showLoading(processId, false);
@@ -84,9 +144,9 @@ public abstract class BasePresenter<V extends BaseContract.View>
         Timber.e(throwable);
         getView().showError(processCode, throwable.hashCode(), throwable.getLocalizedMessage());
         /*if (throwable instanceof MyRestException) {
-            MyRestException ciayoRestException = ((MyRestException)throwable);
-            int errorCode = ciayoRestException.getErrorCode();
-            String message = ciayoRestException.getMessage();
+            MyRestException restException = ((MyRestException)throwable);
+            int errorCode = restException.getErrorCode();
+            String message = restException.getMessage();
             getView().showError(processCode, errorCode, message);
         }else{
             getView().showError(processCode, -1, "");

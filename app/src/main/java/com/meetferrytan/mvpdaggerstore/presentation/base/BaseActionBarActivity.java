@@ -10,7 +10,6 @@ import android.view.MenuItem;
  */
 
 public abstract class BaseActionBarActivity extends AppCompatActivity {
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);

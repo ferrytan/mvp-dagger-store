@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:id="@+id/textView"
-        android:scrollbars = "vertical"
+        android:scrollbars="vertical"
         android:maxLines="100"
         android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"

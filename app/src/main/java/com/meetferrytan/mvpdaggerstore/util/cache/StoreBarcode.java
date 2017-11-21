@@ -17,7 +17,6 @@ public class StoreBarcode {
     private File mUploadFile;
     private String mCacheKey;
 
-
     /**
      * Barcode constructor
      *

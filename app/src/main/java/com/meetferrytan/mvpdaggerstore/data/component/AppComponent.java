@@ -25,7 +25,6 @@ import dagger.android.support.AndroidSupportInjectionModule;
                 SchedulerModule.class,
                 AndroidBindingModule.class,
                 AndroidSupportInjectionModule.class})
-
 @Singleton
 public interface AppComponent extends AndroidInjector<MyApp> {
     @Component.Builder

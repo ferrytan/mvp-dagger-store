@@ -72,13 +72,13 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    MyResponseInterceptor provideCiayoResponseInterceptor() {
+    MyResponseInterceptor provideResponseInterceptor() {
         return new MyResponseInterceptor();
     }
 
     @Provides
     @Singleton
-    MyRequestInterceptor provideCiayoRequestInterceptor() {
+    MyRequestInterceptor provideRequestInterceptor() {
         return new MyRequestInterceptor();
     }
 
