@@ -1,10 +1,12 @@
 package com.meetferrytan.mvpdaggerstore.data.module;
 
 import android.app.Application;
+import android.net.ConnectivityManager;
 
 import com.meetferrytan.mvpdaggerstore.BuildConfig;
 import com.meetferrytan.mvpdaggerstore.util.format.BufferedSourceConverterFactory;
 import com.meetferrytan.mvpdaggerstore.util.injection.DIConstants;
+import com.meetferrytan.mvpdaggerstore.util.interceptors.ConnectivityInterceptor;
 import com.meetferrytan.mvpdaggerstore.util.interceptors.MyRequestInterceptor;
 import com.meetferrytan.mvpdaggerstore.util.interceptors.MyResponseInterceptor;
 
@@ -80,6 +82,12 @@ public class NetworkModule {
     @Singleton
     MyRequestInterceptor provideRequestInterceptor() {
         return new MyRequestInterceptor();
+    }
+
+    @Provides
+    @Singleton
+    ConnectivityInterceptor provideConnectivityInterceptor(ConnectivityManager connectivityManager) {
+        return new ConnectivityInterceptor(connectivityManager);
     }
 
     @Provides
