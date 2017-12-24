@@ -20,7 +20,7 @@ Template i personally used for Java Android projects
 - [Mockito](https://github.com/mockito/mockito)
 
 # Example Project Screenshot
-![example](https://raw.githubusercontent.com/ferrytan/mvp-dagger-store/master/screenshot/screenshot.jpg)
+  <img src="https://raw.githubusercontent.com/ferrytan/mvp-dagger-store/master/screenshot/screenshot.jpg" width="400" height="614"/>
 # More
 Any inputs are appreciated!
 # Author
