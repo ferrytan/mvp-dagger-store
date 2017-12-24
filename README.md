@@ -19,6 +19,8 @@ Template i personally used for Java Android projects
 - [Timber](https://github.com/JakeWharton/timber/)
 - [Mockito](https://github.com/mockito/mockito)
 
+# Example Project Screenshot
+![example](https://raw.githubusercontent.com/ferrytan/mvp-dagger-store/master/screenshot/screenshot.jpg)
 # More
 Any inputs are appreciated!
 # Author
