@@ -1,6 +1,5 @@
 package com.meetferrytan.mvpdaggerstore.presentation.example;
 
-import com.google.gson.Gson;
 import com.meetferrytan.mvpdaggerstore.data.entity.User;
 import com.meetferrytan.mvpdaggerstore.presentation.base.BasePresenter;
 import com.meetferrytan.mvpdaggerstore.util.cache.StoreBarcode;
@@ -10,7 +9,6 @@ import com.nytimes.android.external.store3.base.impl.Store;
 import javax.inject.Inject;
 
 import io.reactivex.Scheduler;
-import retrofit2.Retrofit;
 import timber.log.Timber;
 
 import static com.meetferrytan.mvpdaggerstore.util.schedulers.SchedulerType.IO;
@@ -20,25 +18,16 @@ import static com.meetferrytan.mvpdaggerstore.util.schedulers.SchedulerType.UI;
  * Created by ferrytan on 10/22/17.
  */
 
-public class ExamplePresenter extends BasePresenter<ExampleContract.View>
-        implements ExampleContract.Presenter {
+public class GithubUserSearchPresenter extends BasePresenter<GithubUserSearchContract.View>
+        implements GithubUserSearchContract.Presenter {
 
     public static final int PROCESS_GET_USER_DETAIL = 101;
-    @Inject
-    Store<User, StoreBarcode> mUserDetailStore;
-    @Inject
-    @RunOn(UI)
-    Scheduler mUiScheduler;
-    @Inject
-    @RunOn(IO)
-    Scheduler mIoScheduler;
-    @Inject
-    Retrofit mRetrofit;
-    @Inject
-    Gson mGson;
+    @Inject Store<User, StoreBarcode> mUserDetailStore;
+    @Inject @RunOn(UI) Scheduler mUiScheduler;
+    @Inject @RunOn(IO) Scheduler mIoScheduler;
 
     @Inject
-    public ExamplePresenter() {
+    public GithubUserSearchPresenter() {
     }
 
     @Override
@@ -82,7 +71,7 @@ public class ExamplePresenter extends BasePresenter<ExampleContract.View>
 
     @Override
     public void getUserDetail(String username) {
-        StoreBarcode barCode = new StoreBarcode("", "getUserDetail", username);
+        StoreBarcode barCode = new StoreBarcode(null, "getUserDetail", username);
         processSingleRequest(
                 mUserDetailStore.get(barCode)
                         .observeOn(mUiScheduler) // observe on UI thread

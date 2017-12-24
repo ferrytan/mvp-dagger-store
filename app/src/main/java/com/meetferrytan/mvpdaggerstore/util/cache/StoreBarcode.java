@@ -3,8 +3,11 @@ package com.meetferrytan.mvpdaggerstore.util.cache;
 import com.meetferrytan.mvpdaggerstore.util.format.MD5Digest;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ferrytan on 11/11/17.
@@ -13,7 +16,7 @@ import java.util.List;
 public class StoreBarcode {
     private String mKey;
     private List<String> mPaths;
-    private String mParameters;
+    private Map<String, String> mParameters;
     private File mUploadFile;
     private String mCacheKey;
 
@@ -24,7 +27,7 @@ public class StoreBarcode {
      * @param key        API url unique key
      * @param paths      API optional paths
      */
-    public StoreBarcode(String parameters, String key, String... paths) {
+    public StoreBarcode(Map<String, String> parameters, String key, String... paths) {
         mKey = key;
         mParameters = parameters;
         mPaths = Arrays.asList(paths);
@@ -32,7 +35,7 @@ public class StoreBarcode {
         mCacheKey = generateCacheKey();
     }
 
-    public String getParameters() {
+    public Map<String, String> getParameters() {
         return mParameters;
     }
 
@@ -62,14 +65,39 @@ public class StoreBarcode {
      *
      * @return MD5 hash for unique cache key
      */
-    private String generateCacheKey() {
+
+    public String generateCacheKey() {
         String cacheKey = mKey;
 
         for (String path : mPaths) {
             cacheKey = cacheKey.concat("/").concat(path);
         }
-        cacheKey = cacheKey.concat("?p=" + mParameters);
 
+        if (mParameters != null) {
+            cacheKey = cacheKey.concat("?p=" + urlEncodeUTF8(mParameters));
+        }
         return MD5Digest.getHash(cacheKey);
+    }
+
+    private static String urlEncodeUTF8(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
+
+    private static String urlEncodeUTF8(Map<?, ?> map) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            if (sb.length() > 0) {
+                sb.append("&");
+            }
+            sb.append(String.format("%s=%s",
+                    urlEncodeUTF8(entry.getKey().toString()),
+                    urlEncodeUTF8(entry.getValue().toString())
+            ));
+        }
+        return sb.toString();
     }
 }

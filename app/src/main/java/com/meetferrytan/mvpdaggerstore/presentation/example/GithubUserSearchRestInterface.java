@@ -9,7 +9,7 @@ import retrofit2.http.Path;
  * Created by ferrytan on 10/22/17.
  */
 
-public interface ExampleRestInterface {
+public interface GithubUserSearchRestInterface {
     @GET("users/{username}")
     Single<BufferedSource> getUserDetail(@Path("username") String username);
 }

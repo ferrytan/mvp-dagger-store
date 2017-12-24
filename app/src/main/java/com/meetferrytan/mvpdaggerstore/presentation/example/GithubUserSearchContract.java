@@ -8,7 +8,7 @@ import com.meetferrytan.mvpdaggerstore.presentation.base.BaseContract;
  * Created by ferrytan on 10/22/17.
  */
 
-public interface ExampleContract {
+public interface GithubUserSearchContract {
 
     interface View extends BaseContract.View {
         void showUserDetail(User user);

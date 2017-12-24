@@ -10,9 +10,17 @@ public class User {
     @SerializedName("login")
     private String mLogin;
     @SerializedName("id")
-    private String mId;
+    private long mId;
     @SerializedName("name")
     private String mName;
+    @SerializedName("avatar_url")
+    private String mAvatar;
+    @SerializedName("location")
+    private String mLocation;
+    @SerializedName("blog")
+    private String mBlog;
+    @SerializedName("public_repos")
+    private int mPublicRepos;
 
     public User() {
     }
@@ -25,11 +33,11 @@ public class User {
         mLogin = login;
     }
 
-    public String getId() {
+    public long getId() {
         return mId;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         mId = id;
     }
 
@@ -39,5 +47,37 @@ public class User {
 
     public void setName(String name) {
         mName = name;
+    }
+
+    public String getAvatar() {
+        return mAvatar;
+    }
+
+    public void setAvatar(String avatar) {
+        mAvatar = avatar;
+    }
+
+    public String getLocation() {
+        return mLocation;
+    }
+
+    public void setLocation(String location) {
+        mLocation = location;
+    }
+
+    public String getBlog() {
+        return mBlog;
+    }
+
+    public void setBlog(String blog) {
+        mBlog = blog;
+    }
+
+    public int getPublicRepos() {
+        return mPublicRepos;
+    }
+
+    public void setPublicRepos(int publicRepos) {
+        mPublicRepos = publicRepos;
     }
 }

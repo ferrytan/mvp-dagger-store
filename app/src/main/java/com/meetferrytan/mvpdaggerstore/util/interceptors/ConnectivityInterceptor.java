@@ -15,7 +15,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class ConnectivityInterceptor implements Interceptor {
-    public static final String NO_INTERNET_CONNECTION_MESSAGE = "No Connectivity Exception";
+    public static final String NO_INTERNET_CONNECTION_MESSAGE = "Not connected to network";
     private final ConnectivityManager mConnectivityManager;
 
     public ConnectivityInterceptor(ConnectivityManager connectivityManager) {
@@ -25,7 +25,7 @@ public class ConnectivityInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         if (!isConnected()) {
-            throw new ConnectException("Not connected to network");
+            throw new ConnectException(NO_INTERNET_CONNECTION_MESSAGE);
         }
 
         Request.Builder builder = chain.request().newBuilder();

@@ -14,27 +14,25 @@ import dagger.Module;
 import dagger.Provides;
 import okio.BufferedSource;
 import retrofit2.Retrofit;
-import timber.log.Timber;
 
 /**
  * Created by ferrytan on 11/6/17.
  */
 
 @Module
-public class ExampleActivityModule {
+public class GithubUserSearchModule {
     @Provides
     @ActivityScope
-    ExampleRestInterface provideExampleApi(Retrofit retrofit) {
-        return retrofit.create(ExampleRestInterface.class);
+    GithubUserSearchRestInterface provideApi(Retrofit retrofit) {
+        return retrofit.create(GithubUserSearchRestInterface.class);
     }
 
     @Provides
     @ActivityScope
     Store<User, StoreBarcode> provideUserDetailStore(
-            ExampleRestInterface api,
+            GithubUserSearchRestInterface api,
             Parser<BufferedSource, User> parser,
             Persister<BufferedSource, StoreBarcode> persister) {
-        Timber.d("provideBannerStore");
         return StoreBuilder.<StoreBarcode, BufferedSource, User>parsedWithKey()
                 .fetcher(barCode -> api.getUserDetail(barCode.getPaths().get(0)))
                 .parser(parser)
@@ -44,8 +42,7 @@ public class ExampleActivityModule {
 
     @Provides
     @ActivityScope
-    Parser<BufferedSource, User> provideBannerParser(Gson gson) {
+    Parser<BufferedSource, User> provideUserParser(Gson gson) {
         return GsonParserFactory.createSourceParser(gson, User.class);
     }
-
 }

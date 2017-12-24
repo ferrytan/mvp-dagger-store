@@ -1,35 +1,29 @@
-package com.meetferrytan.mvpdaggerstore.presentation.example.fragment;
+package com.meetferrytan.mvpdaggerstore.presentation.example.userdetail.userupdate;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.meetferrytan.mvpdaggerstore.R;
 import com.meetferrytan.mvpdaggerstore.presentation.base.BaseMvpFragment;
-import com.meetferrytan.mvpdaggerstore.presentation.example.childfragment.ExampleChildFragment;
 
-import javax.inject.Inject;
-
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
+import butterknife.BindView;
 import dagger.android.support.AndroidSupportInjection;
-import dagger.android.support.HasSupportFragmentInjector;
 
-public class ExampleFragment extends BaseMvpFragment<ExampleFragmentPresenter, ExampleFragmentContract.View>
-        implements ExampleFragmentContract.View, HasSupportFragmentInjector {
+public class UserUpdateFragment extends BaseMvpFragment<UserUpdatePresenter, UserUpdateContract.View>
+        implements UserUpdateContract.View {
 
-    @Inject
-    DispatchingAndroidInjector<Fragment> childFragmentInjector;
+    @BindView(R.id.txvUpdate) TextView txvUpdate;
 
-    public ExampleFragment() {
+    public UserUpdateFragment() {
         // Required empty public constructor
     }
 
-    public static ExampleFragment newInstance() {
-        ExampleFragment fragment = new ExampleFragment();
+    public static UserUpdateFragment newInstance() {
+        UserUpdateFragment fragment = new UserUpdateFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -42,7 +36,7 @@ public class ExampleFragment extends BaseMvpFragment<ExampleFragmentPresenter, E
 
     @Override
     protected View createLayout(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_example, container, false);
+        return inflater.inflate(R.layout.child_fragment_example, container, false);
     }
 
     @Override
@@ -52,26 +46,31 @@ public class ExampleFragment extends BaseMvpFragment<ExampleFragmentPresenter, E
 
     @Override
     public void startingUpFragment(View view, Bundle savedInstanceState) {
-        getChildFragmentManager().beginTransaction().replace(R.id.frameLayout, ExampleChildFragment.newInstance()).commit();
+
     }
 
     @Override
-    public ExampleFragmentContract.View getViewImpl() {
+    public UserUpdateContract.View getViewImpl() {
         return this;
     }
 
     @Override
     public void showError(int processCode, int errorCode, String message) {
-
+        txvUpdate.setText("Error fetching user update: " + message);
     }
 
     @Override
     public void showLoading(int processCode, boolean show) {
+        if (show)
+            txvUpdate.setText("fetching user update...");
+    }
 
+    public void fetchUserUpdate(String username) {
+        getPresenter().getUserUpdate(username);
     }
 
     @Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
-        return childFragmentInjector;
+    public void showUserUpdate(String updateText) {
+        txvUpdate.setText(updateText);
     }
 }

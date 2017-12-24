@@ -7,7 +7,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
-        classpath 'com.google.gms:google-services:3.1.0'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -30,16 +29,16 @@ task clean(type: Delete) {
 
 ext {
     // SDK
-    minSdkVersion = 16
+    minSdkVersion = 18
     targetSdkVersion = 27
     compileSdkVersion = 27
-    buildToolsVersion = '27.0.1'
+    buildToolsVersion = '27.0.2'
 
     versionCode = 1
     versionName = '1.0.0'
 
     // Dependencies
-    supportVersion = '27.0.1'
+    supportVersion = '27.0.2'
     supportTestVersion = '0.5'
     multidexVersion = '1.0.1'
     espressoVersion = '2.2.2'
