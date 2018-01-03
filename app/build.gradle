@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.targetSdkVersion
@@ -43,6 +45,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    kapt {
+        generateStubs = true
+    }
 }
 
 dependencies {
@@ -56,11 +62,11 @@ dependencies {
 
     // Lifecycle arch
     implementation "android.arch.lifecycle:runtime:$rootProject.archLifecycleRuntimeVersion"
-    annotationProcessor "android.arch.lifecycle:compiler:$rootProject.archVersion"
+    kapt "android.arch.lifecycle:compiler:$rootProject.archVersion"
 
     // Room
     implementation "android.arch.persistence.room:runtime:$rootProject.archVersion"
-    annotationProcessor "android.arch.persistence.room:compiler:$rootProject.archVersion"
+    kapt "android.arch.persistence.room:compiler:$rootProject.archVersion"
     implementation "android.arch.persistence.room:rxjava2:$rootProject.archVersion"
 
     // Retrofit
@@ -82,14 +88,14 @@ dependencies {
 
     // ButterKnife
     implementation "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
+    kapt "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
 
     // Dagger
     implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
     implementation "com.google.dagger:dagger-android:$rootProject.daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
-    annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
-    annotationProcessor "com.google.dagger:dagger-android-processor:$rootProject.daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+    kapt "com.google.dagger:dagger-android-processor:$rootProject.daggerVersion"
 
     // RxJava
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxJavaVersion"
@@ -97,8 +103,8 @@ dependencies {
 
     // Glide
     implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
-    annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
-    compile("com.github.bumptech.glide:okhttp3-integration:$rootProject.glideVersion") {
+    kapt "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
+    implementation("com.github.bumptech.glide:okhttp3-integration:$rootProject.glideVersion") {
         exclude group: 'glide-parent'
     }
 
@@ -127,4 +133,5 @@ dependencies {
 
     // Other Dependencies
     provided "org.glassfish:javax.annotation:$rootProject.javaxAnnotationVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
