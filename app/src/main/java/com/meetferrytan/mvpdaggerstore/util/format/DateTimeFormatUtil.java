@@ -137,9 +137,6 @@ public class DateTimeFormatUtil {
         long now = System.currentTimeMillis();
         long duration = (now - timestampInUtcMilliseconds);
         String readableDate;
-        String prefix = "";
-        long maxTotal = 0;
-        long total = 0;
 
         Calendar nowCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         nowCalendar.setTimeInMillis(now);
@@ -175,70 +172,95 @@ public class DateTimeFormatUtil {
         if (isYesterday) {
             readableDate = YESTERDAY;
         } else {
+            DateDetail dateDetail = defineDatePrefix(bounds, new DateDetail(duration));
+            long total = dateDetail.getTotal();
+            long maxTotal = dateDetail.getMaxTotal();
+            if (total <= maxTotal) {
+                String prefix = dateDetail.getPrefix();
+                readableDate = String.valueOf(total) + prefix;
+                if (total > 1) readableDate += DEFAULT_PLURAL;
+                readableDate += DEFAULT_POSTFIX;
+            } else {
+                if (fullDateFormat != null) {
+                    formatter = new SimpleDateFormat(fullDateFormat, Locale.getDefault());
+                } else {
+                    formatter = new SimpleDateFormat(isLastYear ? DEFAULT_DATE_FORMAT_FULL : DEFAULT_DATE_FORMAT_DATETIME, Locale.getDefault());
+                }
+                formatter.setTimeZone(TimeZone.getDefault());
 
-            switch (bounds) {
-                case BOUND_YEAR:
-                    if (duration > ONE_YEAR) {
-                        total = duration / ONE_YEAR;
-                        prefix = DEFAULT_PREFIX_YEARS;
-                        maxTotal = MAX_YEAR;
-                    }
-                case BOUND_MONTH:
-                    if (total == 0 && duration > ONE_MONTH) {
-                        total = duration / ONE_MONTH;
-                        prefix = DEFAULT_PREFIX_MONTHS;
-                        maxTotal = DAYS_OF_MONTH;
-                    }
-                case BOUND_WEEK:
-                    if (total == 0 && duration > ONE_WEEK) {
-                        total = duration / ONE_WEEK;
-                        prefix = DEFAULT_PREFIX_WEEKS;
-                        maxTotal = WEEKS;
-                    }
-                case BOUND_DAY:
-                    if (total == 0 && duration > ONE_DAY) {
-                        total = duration / ONE_DAY;
-                        prefix = DEFAULT_PREFIX_DAYS;
-                        maxTotal = DAYS_OF_WEEK;
-                    }
-                case BOUND_HOUR:
-                    if (total == 0 && duration > ONE_HOUR) {
-                        total = duration / ONE_HOUR;
-                        prefix = DEFAULT_PREFIX_HOURS;
-                        maxTotal = HOURS;
-                    }
-                case BOUND_MINUTES:
-                    if (total == 0 && duration > ONE_MINUTE) {
-                        total = duration / ONE_MINUTE;
-                        prefix = DEFAULT_PREFIX_MINUTES;
-                        maxTotal = MINUTES;
-                    }
-                case BOUND_SECONDS:
-                    if (total == 0) {
-                        total = duration / ONE_SECOND;
-                        prefix = DEFAULT_PREFIX_SECONDS;
-                        maxTotal = SECONDS;
-                    }
-                default:
-                    if (total <= maxTotal) {
-                        readableDate = String.valueOf(total) + prefix;
-                        if (total > 1) readableDate += DEFAULT_PLURAL;
-                        readableDate += DEFAULT_POSTFIX;
-                    } else {
-                        boolean newRelease = targetCalendar.after(nowCalendar);
-                        if (fullDateFormat != null) {
-                            formatter = new SimpleDateFormat(fullDateFormat, Locale.getDefault());
-                        } else {
-                            formatter = new SimpleDateFormat(isLastYear ? DEFAULT_DATE_FORMAT_FULL : newRelease ? DEFAULT_DATE_FORMAT_DATETIME : DEFAULT_DATE_FORMAT_PARTIAL, Locale.getDefault());
-                        }
-                        formatter.setTimeZone(TimeZone.getDefault());
-
-                        readableDate = formatter.format(targetCalendar.getTimeInMillis());
-                    }
+                readableDate = formatter.format(targetCalendar.getTimeInMillis());
             }
         }
         Timber.d("millisToReadableDate: " + readableDate);
         return readableDate;
+    }
+
+    private static DateDetail defineDatePrefix(int lastCheckedBound, DateDetail dateDetail) {
+
+        long duration = dateDetail.getDuration();
+        long total;
+        long maxTotal;
+        String prefix;
+
+        if (lastCheckedBound == BOUND_YEAR) {
+            if (duration >= ONE_YEAR) {
+                total = duration / ONE_YEAR;
+                prefix = DEFAULT_PREFIX_YEARS;
+                maxTotal = MAX_YEAR;
+            } else {
+                return defineDatePrefix(lastCheckedBound+1, dateDetail);
+            }
+        } else if (lastCheckedBound == BOUND_MONTH) {
+            if (duration >= ONE_MONTH) {
+                total = duration / ONE_MONTH;
+                prefix = DEFAULT_PREFIX_MONTHS;
+                maxTotal = DAYS_OF_MONTH;
+            } else {
+                return defineDatePrefix(lastCheckedBound+1, dateDetail);
+            }
+        } else if (lastCheckedBound == BOUND_WEEK) {
+            if (duration >= ONE_WEEK) {
+                total = duration / ONE_WEEK;
+                prefix = DEFAULT_PREFIX_WEEKS;
+                maxTotal = WEEKS;
+            } else {
+                return defineDatePrefix(lastCheckedBound+1, dateDetail);
+            }
+        } else if (lastCheckedBound == BOUND_DAY) {
+            if (duration >= ONE_DAY) {
+                total = duration / ONE_DAY;
+                prefix = DEFAULT_PREFIX_DAYS;
+                maxTotal = DAYS_OF_WEEK;
+            } else {
+                return defineDatePrefix(lastCheckedBound+1, dateDetail);
+            }
+        } else if (lastCheckedBound == BOUND_HOUR) {
+            if (duration >= ONE_HOUR) {
+                total = duration / ONE_HOUR;
+                prefix = DEFAULT_PREFIX_HOURS;
+                maxTotal = HOURS;
+            } else {
+                return defineDatePrefix(lastCheckedBound+1, dateDetail);
+            }
+        } else if (lastCheckedBound == BOUND_MINUTES) {
+            if (duration >= ONE_MINUTE) {
+                total = duration / ONE_MINUTE;
+                prefix = DEFAULT_PREFIX_MINUTES;
+                maxTotal = MINUTES;
+            } else {
+                return defineDatePrefix(lastCheckedBound+1, dateDetail);
+            }
+        } else {
+            total = duration / ONE_SECOND;
+            prefix = DEFAULT_PREFIX_SECONDS;
+            maxTotal = SECONDS;
+        }
+
+        dateDetail.setTotal(total);
+        dateDetail.setPrefix(prefix);
+        dateDetail.setMaxTotal(maxTotal);
+
+        return dateDetail;
     }
 
     public static String millisToReadableDate(long timestampInUtcMilliseconds, @FormatBound int bounds) {
@@ -252,5 +274,48 @@ public class DateTimeFormatUtil {
 
         Timber.d("millisToDateFormat: " + readableDate);
         return readableDate;
+    }
+
+    private static class DateDetail {
+        private long total;
+        private long duration;
+        private long maxTotal;
+        private String prefix;
+
+        public DateDetail(long duration) {
+            this.duration = duration;
+        }
+
+        public long getTotal() {
+            return total;
+        }
+
+        public void setTotal(long total) {
+            this.total = total;
+        }
+
+        public long getDuration() {
+            return duration;
+        }
+
+        public void setDuration(long duration) {
+            this.duration = duration;
+        }
+
+        public long getMaxTotal() {
+            return maxTotal;
+        }
+
+        public void setMaxTotal(long maxTotal) {
+            this.maxTotal = maxTotal;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
     }
 }
